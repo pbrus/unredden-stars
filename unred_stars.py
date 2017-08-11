@@ -1,9 +1,32 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import sys
+from argparse import ArgumentParser
+from argparse import RawTextHelpFormatter as tefo
+
+argparser = ArgumentParser(
+    prog='unred_stars.py',
+    description='>> Script unreddens stars on the color-color plane <<',
+    epilog='Copyright (c) 2017 Przemysław Bruś', formatter_class=tefo
+)
+argparser.add_argument('list_with_stars', help='must contain columns with data:\n\
+id(int) x_color(float) y_color(float) err_xcolor(float) err_ycolor(float)\n\n')
+argparser.add_argument('unred_sequence', help='must contain columns with data:\n\
+x_color(float) y_color(float)\n\n')
+argparser.add_argument('red_slope', help='value of the reddening line slope\n\
+defined as E(y_color)/E(x_color)\n\
+for example: E(U-B)/E(B-V) = 0.72\n\n', type=float)
+argparser.add_argument('R_param', help='defined as A/E(x_color)\n\
+for example: Av/E(B-V) = 3.1', type=float)
+argparser.add_argument('--min', help='for each star print only minimum value of extinction',
+action='store_true')
+argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-11\n \
+* Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
+args = argparser.parse_args()
+
 import numpy as np
 from scipy.optimize import fsolve
+
 
 def get_model(filename):
     with open(filename) as fd_model:
