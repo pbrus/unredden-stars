@@ -20,7 +20,9 @@ argparser.add_argument('R_param', help='defined as A/E(x_color)\n\
 for example: Av/E(B-V) = 3.1', type=float)
 argparser.add_argument('--min', help='for each star print only the minimum value of extinction',
 action='store_true')
-argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-14\n \
+argparser.add_argument('--max', help='for each star print only the maximum value of extinction',
+action='store_true')
+argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-15\n \
 * Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
 args = argparser.parse_args()
 
@@ -33,7 +35,7 @@ def get_model(filename):
         try:
             model = np.loadtxt(fd_model, dtype={'names': ('x','y'), 'formats': ('f4','f4')})
         except ValueError as err:
-            print("Unred model: %s" % err)
+            print("unred_stars: %s" % err)
             exit(1)
 
     return model
@@ -43,7 +45,7 @@ def get_points(filename):
         try:
             points = np.loadtxt(fd_points, dtype={'names': ('id','x','y','xerr','yerr'), 'formats': ('i8','f4','f4','f4','f4')})
         except ValueError as err:
-            print("File with stars: %s" % err)
+            print("unred_stars: %s" % err)
             exit(1)
 
     return points
@@ -93,10 +95,16 @@ if __name__ == "__main__":
     points = get_points(stars)
     model = get_model(unred_seq)
 
+    if args.min and args.max:
+        print("unred_stars: choose only one option: --min or --max")
+        exit()
+
+    dtype = [('pid', int), ('px', float), ('py', float), ('x0', float), ('y0', float), ('Ex', float), ('Ey', float), ('A', float)]
     print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) Av")
 
     for p in points:
         pid = p[0]
+        output_values = []
 
         for px in (p[1],p[1]-p[3],p[1]+p[3]):
             for py in (p[2],p[2]-p[4],p[2]+p[4]):
@@ -109,5 +117,18 @@ if __name__ == "__main__":
                     intersect_y0 = line(parrallel_unred_coeff, intersect_x0)
                     Ex = px - float(intersect_x0)
                     Ey = py - float(intersect_y0)
-                    Av = r_param*Ex
-                    print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % (pid, px, py, intersect_x0, intersect_y0, Ex, Ey, Av))
+                    A = r_param*Ex
+                    output = (pid, px, py, intersect_x0, intersect_y0, Ex, Ey, A)
+                    if args.min or args.max:
+                        output_values += [output]
+                    else:
+                        print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % (output))
+
+        if args.min and len(output_values) > 0:
+            output_array = np.array(output_values, dtype=dtype)
+            min_extinction = tuple(np.sort(output_array, order='A')[0])
+            print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % min_extinction)
+        elif args.max and len(output_values) > 0:
+            output_array = np.array(output_values, dtype=dtype)
+            max_extinction = tuple(np.sort(output_array, order='A')[-1])
+            print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % max_extinction)
