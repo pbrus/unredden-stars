@@ -12,7 +12,7 @@ argparser = ArgumentParser(
 argparser.add_argument('list_with_stars', help='must contain columns with data:\n\
 id(int) x_color(float) y_color(float) err_xcolor(float) err_ycolor(float)\n\n')
 argparser.add_argument('unred_sequence', help='must contain columns with data:\n\
-x_color(float) y_color(float)\n\n')
+x_color(float) y_color(float)\nThe data must be sorted by INCREASING TEMPERATURE\n\n')
 argparser.add_argument('red_slope', help='value of the reddening line slope\n\
 defined as E(y_color)/E(x_color)\n\
 for example: E(U-B)/E(B-V) = 0.72\n\n', type=float)
@@ -22,7 +22,7 @@ argparser.add_argument('--min', help='for each star print only the minimum value
 action='store_true')
 argparser.add_argument('--max', help='for each star print only the maximum value of extinction',
 action='store_true')
-argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-15\n \
+argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-16\n \
 * Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
 args = argparser.parse_args()
 
@@ -124,11 +124,10 @@ if __name__ == "__main__":
                     else:
                         print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % (output))
 
-        if args.min and len(output_values) > 0:
+        if len(output_values) > 0:
             output_array = np.array(output_values, dtype=dtype)
-            min_extinction = tuple(np.sort(output_array, order='A')[0])
-            print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % min_extinction)
-        elif args.max and len(output_values) > 0:
-            output_array = np.array(output_values, dtype=dtype)
-            max_extinction = tuple(np.sort(output_array, order='A')[-1])
-            print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % max_extinction)
+            if args.min:
+                out = tuple(np.sort(output_array, order='A')[0])
+            elif args.max:
+                out = tuple(np.sort(output_array, order='A')[-1])
+            print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % out)
