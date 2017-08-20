@@ -22,7 +22,7 @@ argparser.add_argument('--min', help='for each star print only the minimum value
 action='store_true')
 argparser.add_argument('--max', help='for each star print only the maximum value of extinction',
 action='store_true')
-argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-16\n \
+argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-20\n \
 * Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
 args = argparser.parse_args()
 
@@ -33,7 +33,7 @@ from scipy.optimize import fsolve
 def get_model(filename):
     with open(filename) as fd_model:
         try:
-            model = np.loadtxt(fd_model, dtype={'names': ('x','y'), 'formats': ('f4','f4')})
+            model = np.loadtxt(fd_model, dtype={'names': ('x','y'), 'formats': ('f8','f8')})
         except ValueError as err:
             print("unred_stars: %s" % err)
             exit(1)
@@ -43,7 +43,7 @@ def get_model(filename):
 def get_points(filename):
     with open(filename) as fd_points:
         try:
-            points = np.loadtxt(fd_points, dtype={'names': ('id','x','y','xerr','yerr'), 'formats': ('i8','f4','f4','f4','f4')})
+            points = np.loadtxt(fd_points, dtype={'names': ('id','x','y','xerr','yerr'), 'formats': ('i8','f8','f8','f8','f8')}, ndmin=1)
         except ValueError as err:
             print("unred_stars: %s" % err)
             exit(1)
@@ -53,7 +53,7 @@ def get_points(filename):
 def model_slope_positions(point, model, line_slope):
     idxs = []
     for i,m in enumerate(zip(model, model[1:])):
-        if point[0] < m[0][0]:
+        if point[0] <= m[0][0]:
             continue
         else:
             diff_slope1 = slope_line(point, m[0]) - line_slope
