@@ -1,4 +1,4 @@
-# Unredden-stars [![GitHub release](http://www.astro.uni.wroc.pl/ludzie/brus/img/github/ver20170820.svg "download")](https://github.com/pbrus/unredden-stars/blob/master/unred_stars.py) ![Written in Python](http://www.astro.uni.wroc.pl/ludzie/brus/img/github/python.svg "language")
+# Unredden-stars [![GitHub release](http://www.astro.uni.wroc.pl/ludzie/brus/img/github/ver20170825.svg "download")](https://github.com/pbrus/unredden-stars/blob/master/unred_stars.py) ![Written in Python](http://www.astro.uni.wroc.pl/ludzie/brus/img/github/python.svg "language")
 
 Aids to unredden stars on the color-color plane.
 

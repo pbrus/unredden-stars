@@ -22,7 +22,7 @@ argparser.add_argument('--min', help='for each star print only the minimum value
 action='store_true')
 argparser.add_argument('--max', help='for each star print only the maximum value of extinction',
 action='store_true')
-argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-20\n \
+argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-25\n \
 * Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
 args = argparser.parse_args()
 
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         exit()
 
     dtype = [('pid', int), ('px', float), ('py', float), ('x0', float), ('y0', float), ('Ex', float), ('Ey', float), ('A', float)]
-    print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) Av")
+    print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
 
     for p in points:
         pid = p[0]
