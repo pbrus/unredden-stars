@@ -8,9 +8,9 @@ Aids to unredden stars on the color-color plane.
 
 Download `unred_stars.py` wherever you want and make the script executable. I recommend to download it to any catalog pointed by the `$PATH` variable. Moreover you should have installed *Python 2.7* with the following modules:
 
- * *numpy*
- * *scipy*
- * *argparse*
+ * *scipy 0.19.1*
+ * *numpy 1.13.1*
+ * *argparse 1.1*
 
 To use the program properly you need to prepare a file with data. At the beginning call the script from the terminal window with the `-h` option:
 ```bash
