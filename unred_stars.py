@@ -1,31 +1,65 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-from argparse import ArgumentParser
-from argparse import RawTextHelpFormatter as tefo
 import numpy as np
 from scipy.optimize import fsolve
+from argparse import ArgumentParser
+from argparse import RawTextHelpFormatter as tefo
 
 
-def get_model(filename):
-    with open(filename) as fd_model:
-        try:
-            model = np.loadtxt(fd_model, dtype={'names': ('x','y'), 'formats': ('f8','f8')})
-        except ValueError as err:
-            print("unred_stars: %s" % err)
-            exit(1)
+def _read_file(filename, data_type):
+    try:
+        with open(filename, 'r') as file_descriptor:
+            file_content = np.loadtxt(file_descriptor, data_type, ndmin=1)
+    except FileNotFoundError:
+        print("File {} doesn't exist!".format(filename))
+        exit(1)
+
+    return file_content
+
+def read_unreddened_sequence(filename):
+    """
+    Read an unreddened sequence of stars from a text file.
+
+    Parameters
+    ----------
+    filename : str
+        The name (with a path if neccessary) of the file which
+        contains two columns with floats. The first one represents
+        X color, the second column - Y color. The data must
+        be sorted by increasing temperature.
+
+    Returns
+    -------
+    model : ndarray
+        Data read from the text file.
+    """
+    data_type={'names': ('x','y'), 'formats': ('f8','f8')}
+    model = _read_file(filename, data_type)
 
     return model
 
-def get_points(filename):
-    with open(filename) as fd_points:
-        try:
-            points = np.loadtxt(fd_points, dtype={'names': ('id','x','y','xerr','yerr'), 'formats': ('i8','f8','f8','f8','f8')}, ndmin=1)
-        except ValueError as err:
-            print("unred_stars: %s" % err)
-            exit(1)
+def read_reddened_stars(filename):
+    """
+    Read reddened stars from a text file.
 
-    return points
+    Parameters
+    ----------
+    filename : str
+        The name (with a path if neccessary) of the file which
+        has 5 five columns. The first one with integers, the rest
+        with floats. Each column represents: star_id, x_color, y_color,
+        x_color_error, y_color_error.
+
+    Returns
+    -------
+    stars : ndarray
+        Data read from the text file.
+    """
+    data_type={'names': ('id','x','y','xerr','yerr'),
+               'formats': ('i8','f8','f8','f8','f8')}
+    stars = _read_file(filename, data_type)
+
+    return stars
 
 def model_slope_positions(point, model, line_slope):
     idxs = []
@@ -62,7 +96,6 @@ def line(coeff,x):
 def find_intersection(line1_coeff, line2_coeff):
     return fsolve(lambda x: line(line1_coeff,x) - line(line2_coeff,x),0.0)
 
-
 if __name__ == "__main__":
     argparser = ArgumentParser(
     prog='unred_stars.py',
@@ -91,8 +124,8 @@ if __name__ == "__main__":
     unred_line = args.red_slope
     r_param = args.R_param
 
-    points = get_points(stars)
-    model = get_model(unred_seq)
+    points = read_reddened_stars(stars)
+    model = read_unreddened_sequence(unred_seq)
 
     if args.min and args.max:
         print("unred_stars: choose only one option: --min or --max")
