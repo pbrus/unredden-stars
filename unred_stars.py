@@ -6,22 +6,6 @@ from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter as tefo
 from unred.unred import *
 
-def model_slope_positions(point, model, line_slope):
-    idxs = []
-    for i,m in enumerate(zip(model, model[1:])):
-        if point[0] <= m[0][0]:
-            continue
-        else:
-            diff_slope1 = slope_line(point, m[0]) - line_slope
-            diff_slope2 = slope_line(point, m[1]) - line_slope
-
-            if diff_slope1 * diff_slope2 < 0:
-                idxs += [i]
-
-    return idxs
-
-def slope_line(coo1, coo2):
-    return (coo2[1] - coo1[1])/(coo2[0] - coo1[0])
 
 def y_intercept_line(slope, point):
     return point[1] - slope*point[0]
