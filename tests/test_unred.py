@@ -8,10 +8,18 @@ from unred.unred import *
 class UnredTest(unittest.TestCase):
 
     def setUp(self):
-        self.sequence = read_unreddened_sequence(
-            "example_data/ub_bv_dwarfs.dat")
-        self.stars = read_reddened_stars("example_data/stars.dat")
+        data_dir = "example_data/"
+        self.sequence = read_unreddened_sequence(data_dir + "ub_bv_dwarfs.dat")
+        self.stars = read_reddened_stars(data_dir + "stars.dat")
         self.reddening_line_slope = 0.72
+        self.nodes = (
+            [176], [177],
+            [102, 117, 175],
+            [176], [176],
+            [100, 119, 175],
+            [176], [177],
+            [105, 114, 175]
+        )
 
     def test_read_unreddened_sequence(self):
         indexes = 25, 46, 71
@@ -37,15 +45,8 @@ class UnredTest(unittest.TestCase):
 
     def test_unreddened_sequence_nodes(self):
         star = self.get_star_position(self.stars[1])
-        nodes = (
-            [176],
-            [177],
-            [102, 117, 175],
-            [176],
-            [176],
-        )
 
-        for node in nodes:
+        for node in self.nodes:
             node_number = unreddened_sequence_nodes(
                 next(star), self.sequence, self.reddening_line_slope)
             self.assertEqual(list(node_number), node)
@@ -63,6 +64,29 @@ class UnredTest(unittest.TestCase):
         second_point = (5.11, 2.01)
         slope = slope_line(first_point, second_point)
         self.assertAlmostEqual(slope, 2.9310344827586197)
+
+    def test_y_intercept_line(self):
+        y_intercept = y_intercept_line(1.23, (3.94, -0.42))
+        self.assertAlmostEqual(y_intercept, -5.2661999999999995)
+
+    def test_interpolation_line_coefficients(self):
+        indexes = 0, 1, 2
+        values = (
+            (1.1999999999999986, -0.6451999999999991),
+            (0.1999999999999998, -0.09639999999999989),
+            (4.480000000000003, 0.05310000000000037),
+        )
+
+        data = [interpolation_line_coefficients(self.sequence, i)
+            for i in self.nodes]
+        self.assertLoopingValues(data[2], indexes, values)
+
+    def test_line(self):
+        self.assertAlmostEqual(line((-0.43, 8.12), 21.4), -1.0820000000000007)
+
+    def test_find_intersection(self):
+        intersection = find_intersection((2.61, -4.32), (-7.10, 2.61))
+        self.assertAlmostEqual(float(intersection), 0.71369722)
 
 
 if __name__ == "__main__":
