@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import fsolve
 
 
 def _read_file(filename, data_type):
@@ -59,8 +60,8 @@ def read_reddened_stars(filename):
 def unreddened_sequence_nodes(point, unreddened_sequence, reddening_line_slope):
     """
     Determine an index(es) of the n-th point(s) of the unreddened sequence
-    for the given point P(x, y). n-th and n+1-th points set a straight
-    line which intersects with the reddening line passing through P.
+    for the given point P(x, y). n-th and n+1-th points set a segment
+    which intersects with the reddening line passing through P.
 
     Parameters
     ----------
@@ -113,3 +114,22 @@ def slope_line(first_point, second_point):
     slope /= (second_point[0] - first_point[0])
 
     return slope
+
+def y_intercept_line(slope, point):
+    return point[1] - slope*point[0]
+
+def interpolation_line_coefficients(unreddened_sequence, sequence_nodes):
+    coefficients = ()
+
+    for node in sequence_nodes:
+        A = slope_line(unreddened_sequence[node+1], unreddened_sequence[node])
+        B = y_intercept_line(A, unreddened_sequence[node])
+        coefficients += (A,B),
+
+    return coefficients
+
+def line(coefficients, x):
+    return coefficients[0]*x + coefficients[1]
+
+def find_intersection(first_line, second_line):
+    return fsolve(lambda x: line(first_line, x) - line(second_line, x), 0.0)

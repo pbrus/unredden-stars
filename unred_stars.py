@@ -1,94 +1,73 @@
 #!/usr/bin/env python3
 
-import numpy as np
-from scipy.optimize import fsolve
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter as tefo
 from unred.unred import *
 
 
-def y_intercept_line(slope, point):
-    return point[1] - slope*point[0]
+argparser = ArgumentParser(
+prog='unred_stars.py',
+description='>> Script unreddens stars on the color-color plane <<',
+epilog='Copyright (c) 2017 Przemysław Bruś', formatter_class=tefo
+)
+argparser.add_argument('list_with_stars', help='must contain columns with data:\n\
+id(int) x_color(float) y_color(float) err_xcolor(float) err_ycolor(float)\n\n')
+argparser.add_argument('unred_sequence', help='must contain columns with data:\n\
+x_color(float) y_color(float)\nThe data must be sorted by INCREASING TEMPERATURE\n\n')
+argparser.add_argument('red_slope', help='value of the reddening line slope\n\
+defined as E(y_color)/E(x_color)\n\
+for example: E(U-B)/E(B-V) = 0.72\n\n', type=float)
+argparser.add_argument('R_param', help='defined as A/E(x_color)\n\
+for example: Av/E(B-V) = 3.1', type=float)
+argparser.add_argument('--min', help='for each star print only the minimum value of extinction',
+action='store_true')
+argparser.add_argument('--max', help='for each star print only the maximum value of extinction',
+action='store_true')
+argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-25\n \
+* Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
+args = argparser.parse_args()
 
-def interpolation_line_coeff(model, idxs):
-    coeff = ()
-    for i in idxs:
-        A = slope_line(model[i+1], model[i])
-        B = y_intercept_line(A, model[i])
-        coeff += (A,B),
+stars = args.list_with_stars
+unred_seq = args.unred_sequence
+unred_line = args.red_slope
+r_param = args.R_param
 
-    return coeff
+points = read_reddened_stars(stars)
+model = read_unreddened_sequence(unred_seq)
 
-def line(coeff,x):
-    return coeff[0]*x + coeff[1]
+if args.min and args.max:
+    print("unred_stars: choose only one option: --min or --max")
+    exit()
 
-def find_intersection(line1_coeff, line2_coeff):
-    return fsolve(lambda x: line(line1_coeff,x) - line(line2_coeff,x),0.0)
+dtype = [('pid', int), ('px', float), ('py', float), ('x0', float), ('y0', float), ('Ex', float), ('Ey', float), ('A', float)]
+print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
 
-if __name__ == "__main__":
-    argparser = ArgumentParser(
-    prog='unred_stars.py',
-    description='>> Script unreddens stars on the color-color plane <<',
-    epilog='Copyright (c) 2017 Przemysław Bruś', formatter_class=tefo
-    )
-    argparser.add_argument('list_with_stars', help='must contain columns with data:\n\
-    id(int) x_color(float) y_color(float) err_xcolor(float) err_ycolor(float)\n\n')
-    argparser.add_argument('unred_sequence', help='must contain columns with data:\n\
-    x_color(float) y_color(float)\nThe data must be sorted by INCREASING TEMPERATURE\n\n')
-    argparser.add_argument('red_slope', help='value of the reddening line slope\n\
-    defined as E(y_color)/E(x_color)\n\
-    for example: E(U-B)/E(B-V) = 0.72\n\n', type=float)
-    argparser.add_argument('R_param', help='defined as A/E(x_color)\n\
-    for example: Av/E(B-V) = 3.1', type=float)
-    argparser.add_argument('--min', help='for each star print only the minimum value of extinction',
-    action='store_true')
-    argparser.add_argument('--max', help='for each star print only the maximum value of extinction',
-    action='store_true')
-    argparser.add_argument('-v', '--version', action='version', version='%(prog)s\n * Version: 2017-08-25\n \
-    * Licensed under the MIT license:\n   http://opensource.org/licenses/MIT\n * Copyright (c) 2017 Przemysław Bruś')
-    args = argparser.parse_args()
+for p in points:
+    pid = p[0]
+    output_values = []
 
-    stars = args.list_with_stars
-    unred_seq = args.unred_sequence
-    unred_line = args.red_slope
-    r_param = args.R_param
+    for px in (p[1],p[1]-p[3],p[1]+p[3]):
+        for py in (p[2],p[2]-p[4],p[2]+p[4]):
+            idxs = unreddened_sequence_nodes((px, py), model, unred_line)
+            interpol_line_coeff = interpolation_line_coefficients(model, idxs)
+            parrallel_unred_coeff = unred_line, y_intercept_line(unred_line, (px,py))
 
-    points = read_reddened_stars(stars)
-    model = read_unreddened_sequence(unred_seq)
+            for i,idx in enumerate(idxs):
+                intersect_x0 = find_intersection(interpol_line_coeff[i], parrallel_unred_coeff)
+                intersect_y0 = line(parrallel_unred_coeff, intersect_x0)
+                Ex = px - float(intersect_x0)
+                Ey = py - float(intersect_y0)
+                A = r_param*Ex
+                output = (pid, px, py, intersect_x0, intersect_y0, Ex, Ey, A)
+                if args.min or args.max:
+                    output_values += [output]
+                else:
+                    print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % (output))
 
-    if args.min and args.max:
-        print("unred_stars: choose only one option: --min or --max")
-        exit()
-
-    dtype = [('pid', int), ('px', float), ('py', float), ('x0', float), ('y0', float), ('Ex', float), ('Ey', float), ('A', float)]
-    print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
-
-    for p in points:
-        pid = p[0]
-        output_values = []
-
-        for px in (p[1],p[1]-p[3],p[1]+p[3]):
-            for py in (p[2],p[2]-p[4],p[2]+p[4]):
-                idxs = model_slope_positions((px, py), model, unred_line)
-                interpol_line_coeff = interpolation_line_coeff(model, idxs)
-                parrallel_unred_coeff = unred_line, y_intercept_line(unred_line, (px,py))
-
-                for i,idx in enumerate(idxs):
-                    intersect_x0 = find_intersection(interpol_line_coeff[i], parrallel_unred_coeff)
-                    intersect_y0 = line(parrallel_unred_coeff, intersect_x0)
-                    Ex = px - float(intersect_x0)
-                    Ey = py - float(intersect_y0)
-                    A = r_param*Ex
-                    output = (pid, px, py, intersect_x0, intersect_y0, Ex, Ey, A)
-                    if args.min or args.max:
-                        output_values += [output]
-                    else:
-                        print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % (output))
-
-        if len(output_values) > 0:
-            output_array = np.array(output_values, dtype=dtype)
-            if args.min:
-                out = tuple(np.sort(output_array, order='A')[0])
-            elif args.max:
-                out = tuple(np.sort(output_array, order='A')[-1])
+    if len(output_values) > 0:
+        output_array = np.array(output_values, dtype=dtype)
+        if args.min:
+            out = tuple(np.sort(output_array, order='A')[0])
+        elif args.max:
+            out = tuple(np.sort(output_array, order='A')[-1])
             print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % out)
