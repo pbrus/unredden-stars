@@ -116,9 +116,42 @@ def slope_line(first_point, second_point):
     return slope
 
 def y_intercept_line(slope, point):
+    """
+    Calculate a y-intercept of a line for given values of slope and point.
+
+    Parameters
+    ----------
+    slope : float
+        A value of slope line.
+    point : tuple
+        A tuple with xy coordinates.
+
+    Returns
+    -------
+    y-intercept : float
+        A vaule of the y-intercept for the line.
+    """
     return point[1] - slope*point[0]
 
 def interpolation_line_coefficients(unreddened_sequence, sequence_nodes):
+    """
+    Calculate coefficients of straight lines of which an unreddened stars
+    sequence is built. The coefficients are calculated only for lines
+    passing through sequence nodes and their next nodes.
+
+    Parameters
+    ----------
+    unreddened_sequence : ndarray
+        A value retured by the read_unreddened_sequence() function.
+    sequence_nodes : list
+        A value retured by the unreddened_sequence_nodes() function.
+
+    Returns
+    -------
+    coefficients : tuple
+        A tuple containing tuples. Each nested tuple has two
+        coefficients of a single straight line.
+    """
     coefficients = ()
 
     for node in sequence_nodes:
@@ -129,7 +162,35 @@ def interpolation_line_coefficients(unreddened_sequence, sequence_nodes):
     return coefficients
 
 def line(coefficients, x):
+    """
+    For a given value x calculate y = A*x + B.
+
+    Parameters
+    ----------
+    coefficients : tuple
+        A tuple with the line coefficients (A, B).
+    x : float
+        An argument of a linear equation.
+
+    Returns
+    -------
+    y : float
+        A calculated value of the linear equation.
+    """
     return coefficients[0]*x + coefficients[1]
 
 def find_intersection(first_line, second_line):
+    """
+    Find x value of common point for two crossing lines.
+
+    Parameters
+    ----------
+    first_line, second_line : tuple
+        A tuple with the line coefficients (A, B).
+
+    Returns
+    -------
+    x : float
+        An x coordinate of the point which belongs to both lines.
+    """
     return fsolve(lambda x: line(first_line, x) - line(second_line, x), 0.0)
