@@ -39,35 +39,8 @@ if args.min and args.max:
     print("unred_stars: choose only one option: --min or --max")
     exit()
 
-dtype = [('pid', int), ('px', float), ('py', float), ('x0', float), ('y0', float), ('Ex', float), ('Ey', float), ('A', float)]
-print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
+res = extinction(points, model, unred_line, r_param)
+res = sort_extinction(res, "max")
+print_extinction(res)
 
-for p in points:
-    pid = p[0]
-    output_values = []
 
-    for px in (p[1],p[1]-p[3],p[1]+p[3]):
-        for py in (p[2],p[2]-p[4],p[2]+p[4]):
-            idxs = unreddened_sequence_nodes((px, py), model, unred_line)
-            interpol_line_coeff = interpolation_line_coefficients(model, idxs)
-            parrallel_unred_coeff = unred_line, y_intercept_line(unred_line, (px,py))
-
-            for i,idx in enumerate(idxs):
-                intersect_x0 = find_intersection(interpol_line_coeff[i], parrallel_unred_coeff)
-                intersect_y0 = line(parrallel_unred_coeff, intersect_x0)
-                Ex = px - float(intersect_x0)
-                Ey = py - float(intersect_y0)
-                A = r_param*Ex
-                output = (pid, px, py, intersect_x0, intersect_y0, Ex, Ey, A)
-                if args.min or args.max:
-                    output_values += [output]
-                else:
-                    print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % (output))
-
-    if len(output_values) > 0:
-        output_array = np.array(output_values, dtype=dtype)
-        if args.min:
-            out = tuple(np.sort(output_array, order='A')[0])
-        elif args.max:
-            out = tuple(np.sort(output_array, order='A')[-1])
-            print("%4i %7.4f %7.4f %7.4f %7.4f %8.4f %7.4f %8.4f" % out)

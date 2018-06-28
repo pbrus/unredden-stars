@@ -194,3 +194,77 @@ def find_intersection(first_line, second_line):
         An x coordinate of the point which belongs to both lines.
     """
     return fsolve(lambda x: line(first_line, x) - line(second_line, x), 0.0)
+
+def point_positions(point):
+    x, y = point[1], point[2]
+    dx, dy = point[3], point[4]
+
+    for x_position in (x, x - dx, x + dx):
+        for y_position in (y, y - dy, y + dy):
+            yield x_position, y_position
+
+def extinction(stars, unreddened_sequence, reddening_line_slope,
+               extinction_parameter):
+
+    extinction_values = []
+
+    for star in stars:
+        star_id = star[0]
+        point_positions_iterator = point_positions(star)
+
+        for point_coordinates in point_positions_iterator:
+                nodes = unreddened_sequence_nodes(
+                    point_coordinates,
+                    unreddened_sequence,
+                    reddening_line_slope)
+                line_coefficients = interpolation_line_coefficients(
+                    unreddened_sequence, nodes)
+                parrallel_line_coefficients = (
+                    reddening_line_slope,
+                    y_intercept_line(reddening_line_slope, point_coordinates))
+
+                for i, node in enumerate(nodes):
+                    intersect_x0 = find_intersection(
+                        line_coefficients[i], parrallel_line_coefficients)
+                    intersect_y0 = line(
+                        parrallel_line_coefficients, intersect_x0)
+                    x_excess = point_coordinates[0] - float(intersect_x0)
+                    y_excess = point_coordinates[1] - float(intersect_y0)
+                    extinction = extinction_parameter*x_excess
+                    output = (star_id,
+                              point_coordinates[0], point_coordinates[1],
+                              float(intersect_x0), float(intersect_y0),
+                              x_excess, y_excess, extinction)
+
+                    extinction_values += [output]
+
+    return extinction_values
+
+def sort_extinction(extinction, sort="min"):
+    stars_indexes = set([star[0] for star in extinction])
+    extinction_values = []
+
+    for star_id in stars_indexes:
+        star_extinction = []
+
+        for ext in extinction:
+            if star_id == ext[0]:
+                star_extinction += [ext]
+
+        if sort == "min":
+            extinction_values += [min(star_extinction, key=lambda x: x[-1])]
+        else:
+            extinction_values += [max(star_extinction, key=lambda x: x[-1])]
+
+    return extinction_values
+
+def print_header():
+    print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
+
+def print_extinction(extinction):
+    string_format = "{0:4d} {1:7.4f} {2:7.4f} {3:7.4f} {4:7.4f}"
+    string_format += " {5:8.4f} {6:7.4f} {7:8.4f}"
+    print_header()
+
+    for row in extinction:
+        print(string_format.format(*row))

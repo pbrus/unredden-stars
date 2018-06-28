@@ -44,20 +44,12 @@ class UnredTest(unittest.TestCase):
                 self.assertEqual(data[index][i], val)
 
     def test_unreddened_sequence_nodes(self):
-        star = self.get_star_position(self.stars[1])
+        star = point_positions(self.stars[1])
 
         for node in self.nodes:
             node_number = unreddened_sequence_nodes(
                 next(star), self.sequence, self.reddening_line_slope)
             self.assertEqual(list(node_number), node)
-
-    def get_star_position(self, position):
-        x, y = position[1], position[2]
-        dx, dy = position[3], position[4]
-
-        for x_position in (x, x - dx, x + dx):
-            for y_position in (y, y - dy, y + dy):
-                yield x_position, y_position
 
     def test_slope_line(self):
         first_point = (3.95, -1.39)
