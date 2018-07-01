@@ -196,6 +196,20 @@ def find_intersection(first_line, second_line):
     return fsolve(lambda x: line(first_line, x) - line(second_line, x), 0.0)
 
 def point_positions(point):
+    """
+    Iterate point positions.
+
+    Parameters
+    ----------
+    point : tuple
+        A tuple made of id, x, y, dx, dy.
+
+    Returns
+    -------
+    x, y : tuple
+        All combinations of a pair (X,Y) where
+        X = x/x-dx/x+dx, Y = y/y-dy/y+dy
+    """
     x, y = point[1], point[2]
     dx, dy = point[3], point[4]
 
@@ -205,7 +219,35 @@ def point_positions(point):
 
 def extinction(stars, unreddened_sequence, reddening_line_slope,
                extinction_parameter):
+    """
+    Assuming that stars come from the unreddened_sequence calculate
+    color excess and extinction knowing the reddening_line_slope and
+    extinction_parameter.
 
+    Parameters
+    ----------
+    stars : ndarray
+        See the read_reddened_stars function.
+    unreddened_sequence : ndarray
+        See the read_unreddened_sequence function.
+    reddening_line_slope : float
+        A value defining a slope of the reddening line.
+    extinction_parameter : float
+        A ratio of total to selective extinction.
+
+    Returns
+    -------
+    extinction_values : list of tuples
+        Each tuple containing:
+        - star id
+        - xy position of a star (x_color, y_color)
+        - xy position of a star without extinction (x0_color, y0_color)
+        - color excess (E(x_color), E(y_color))
+        - extinction
+
+        For one star can be more than one calculated value of extinction.
+        See the point_positions iterator to understand why.
+    """
     extinction_values = []
 
     for star in stars:
@@ -259,9 +301,15 @@ def sort_extinction(extinction, sort="min"):
     return extinction_values
 
 def print_header():
+    """
+    Print a header of the output.
+    """
     print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
 
 def print_extinction(extinction):
+    """
+    Print formatted output.
+    """
     string_format = "{0:4d} {1:7.4f} {2:7.4f} {3:7.4f} {4:7.4f}"
     string_format += " {5:8.4f} {6:7.4f} {7:8.4f}"
     print_header()
