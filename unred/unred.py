@@ -1,3 +1,8 @@
+"""
+For observed colors of stars and their theoretical path
+calculate color excess and extinction.
+
+"""
 import numpy as np
 from scipy.optimize import fsolve
 
@@ -282,7 +287,21 @@ def extinction(stars, unreddened_sequence, reddening_line_slope,
 
     return extinction_values
 
-def sort_extinction(extinction, sort="min"):
+def select_extinction(extinction, way="min"):
+    """
+    For each star sort and select only one extinction value.
+
+    Parameters
+    ----------
+    extinction : list of tuples
+        A list returned by the extinction function.
+    way : string
+        A method to select only one extinction value.
+        - "min"
+        - "max"
+
+        Default value "min".
+    """
     stars_indexes = set([star[0] for star in extinction])
     extinction_values = []
 
@@ -309,6 +328,11 @@ def print_header():
 def print_extinction(extinction):
     """
     Print formatted output.
+
+    Parameters
+    ----------
+    extinction : list of tuples
+        A list returned by the extinction function.
     """
     string_format = "{0:4d} {1:7.4f} {2:7.4f} {3:7.4f} {4:7.4f}"
     string_format += " {5:8.4f} {6:7.4f} {7:8.4f}"
