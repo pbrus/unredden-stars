@@ -312,7 +312,7 @@ def select_extinction(extinction, way="min"):
             if star_id == ext[0]:
                 star_extinction += [ext]
 
-        if sort == "min":
+        if way == "min":
             extinction_values += [min(star_extinction, key=lambda x: x[-1])]
         else:
             extinction_values += [max(star_extinction, key=lambda x: x[-1])]
