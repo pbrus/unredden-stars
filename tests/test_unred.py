@@ -91,7 +91,7 @@ class UnredTest(unittest.TestCase):
 
     def test_extinction(self):
         calculations = extinction(self.stars, self.sequence,
-                                        self.reddening_line_slope, 3.1)
+                                  self.reddening_line_slope, 3.1)
         results = (4, 0.153, 0.054000000000000006, -0.007227513227513221,
                    -0.06136380952380951, 0.16022751322751322,
                    0.11536380952380951, 0.496705291005291)
@@ -101,7 +101,7 @@ class UnredTest(unittest.TestCase):
 
     def test_select_extinction(self):
         calculations = extinction(self.stars, self.sequence,
-                                self.reddening_line_slope, 3.1)
+                                  self.reddening_line_slope, 3.1)
         calc_default = select_extinction(calculations)
         calc_min = select_extinction(calculations, "min")
         calc_max = select_extinction(calculations, "max")

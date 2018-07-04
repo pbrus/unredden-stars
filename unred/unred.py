@@ -13,7 +13,7 @@ def _read_file(filename, data_type):
             file_content = np.loadtxt(file_descriptor, data_type, ndmin=1)
     except FileNotFoundError:
         print("File {} doesn't exist!".format(filename))
-        exit(1)
+        return
 
     return file_content
 
