@@ -1,12 +1,11 @@
 import setuptools
-from importlib import import_module
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name='unred',
-    version=import_module('unred').__version__,
+    version=__import__('unred').__version__,
     author='Przemysław Bruś',
     description='A library to determine the interstellar extinction.',
     long_description=long_description,
