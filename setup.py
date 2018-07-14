@@ -8,7 +8,7 @@ setuptools.setup(
     name='unred',
     version=import_module('unred').__version__,
     author='Przemysław Bruś',
-    description='A library to determine the interstellar extinction.',
+    description='Determine the interstellar extinction for observed stars.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/pbrus/unredden-stars',
