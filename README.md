@@ -1,5 +1,5 @@
 # Unredden-stars
-[![Build Status](https://travis-ci.org/pbrus/unredden-stars.svg?branch=master)](https://travis-ci.org/pbrus/unredden-stars) [![Code](https://img.shields.io/badge/code-Python-blue.svg "Python")](https://www.python.org/) [![License](https://img.shields.io/badge/license-MIT-yellow.svg "MIT license")](https://github.com/pbrus/unredden-stars/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/pbrus/unredden-stars.svg?branch=master)](https://travis-ci.org/pbrus/unredden-stars) [![Code](https://img.shields.io/badge/code-Python-blue.svg "Python")](https://www.python.org/) [![PyPI version](https://badge.fury.io/py/unred.svg)](https://badge.fury.io/py/unred) [![License](https://img.shields.io/badge/license-MIT-yellow.svg "MIT license")](https://github.com/pbrus/unredden-stars/blob/master/LICENSE)
 
 This package allows to determine the interstellar extinction for stars lying on the color-color plane. Using:
 1. theoretical stars sequence
