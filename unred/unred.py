@@ -17,6 +17,7 @@ def _read_file(filename, data_type):
 
     return file_content
 
+
 def read_unreddened_sequence(filename):
     """
     Read an unreddened sequence of stars from a text file.
@@ -34,10 +35,11 @@ def read_unreddened_sequence(filename):
     model : ndarray
         Data read from the text file.
     """
-    data_type = {'names': ('x','y'), 'formats': ('f8','f8')}
+    data_type = {'names': ('x', 'y'), 'formats': ('f8', 'f8')}
     model = _read_file(filename, data_type)
 
     return model
+
 
 def read_reddened_stars(filename):
     """
@@ -56,11 +58,12 @@ def read_reddened_stars(filename):
     stars : ndarray
         Data read from the text file.
     """
-    data_type = {'names': ('id','x','y','xerr','yerr'),
-                 'formats': ('i8','f8','f8','f8','f8')}
+    data_type = {'names': ('id', 'x', 'y', 'xerr', 'yerr'),
+                 'formats': ('i8', 'f8', 'f8', 'f8', 'f8')}
     stars = _read_file(filename, data_type)
 
     return stars
+
 
 def unreddened_sequence_nodes(point, unreddened_sequence, reddening_line_slope):
     """
@@ -86,7 +89,7 @@ def unreddened_sequence_nodes(point, unreddened_sequence, reddening_line_slope):
     nodes_list = []
 
     for node, sequence_piece in (
-        enumerate(zip(unreddened_sequence, unreddened_sequence[1:]))):
+            enumerate(zip(unreddened_sequence, unreddened_sequence[1:]))):
 
         if point[0] <= sequence_piece[0][0]:
             continue
@@ -100,6 +103,7 @@ def unreddened_sequence_nodes(point, unreddened_sequence, reddening_line_slope):
                 nodes_list += [node]
 
     return nodes_list
+
 
 def slope_line(first_point, second_point):
     """
@@ -120,6 +124,7 @@ def slope_line(first_point, second_point):
 
     return slope
 
+
 def y_intercept_line(slope, point):
     """
     Calculate a y-intercept of a line for given values of slope and point.
@@ -137,6 +142,7 @@ def y_intercept_line(slope, point):
         A vaule of the y-intercept for the line.
     """
     return point[1] - slope*point[0]
+
 
 def interpolation_line_coefficients(unreddened_sequence, sequence_nodes):
     """
@@ -162,9 +168,10 @@ def interpolation_line_coefficients(unreddened_sequence, sequence_nodes):
     for node in sequence_nodes:
         A = slope_line(unreddened_sequence[node+1], unreddened_sequence[node])
         B = y_intercept_line(A, unreddened_sequence[node])
-        coefficients += (A,B),
+        coefficients += (A, B),
 
     return coefficients
+
 
 def line(coefficients, x):
     """
@@ -184,6 +191,7 @@ def line(coefficients, x):
     """
     return coefficients[0]*x + coefficients[1]
 
+
 def find_intersection(first_line, second_line):
     """
     Find x value of common point for two crossing lines.
@@ -199,6 +207,7 @@ def find_intersection(first_line, second_line):
         An x coordinate of the point which belongs to both lines.
     """
     return fsolve(lambda x: line(first_line, x) - line(second_line, x), 0.0)
+
 
 def point_positions(point):
     """
@@ -221,6 +230,7 @@ def point_positions(point):
     for x_position in (x, x - dx, x + dx):
         for y_position in (y, y - dy, y + dy):
             yield x_position, y_position
+
 
 def extinction(stars, unreddened_sequence, reddening_line_slope,
                extinction_parameter):
@@ -287,6 +297,7 @@ def extinction(stars, unreddened_sequence, reddening_line_slope,
 
     return extinction_values
 
+
 def select_extinction(extinction, way="min"):
     """
     For each star sort and select only one extinction value.
@@ -319,11 +330,13 @@ def select_extinction(extinction, way="min"):
 
     return extinction_values
 
+
 def print_header():
     """
     Print a header of the output.
     """
     print("# ID x_ci y_ci x_ci0 y_ci0 E(x_ci) E(y_ci) A")
+
 
 def print_extinction(extinction):
     """

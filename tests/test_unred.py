@@ -70,7 +70,7 @@ class UnredTest(unittest.TestCase):
         )
 
         data = [interpolation_line_coefficients(self.sequence, i)
-            for i in self.nodes]
+                for i in self.nodes]
         self.assertLoopingValues(data[2], indexes, values)
 
     def test_line(self):
@@ -85,7 +85,7 @@ class UnredTest(unittest.TestCase):
         position_iterator = point_positions(point)
 
         for i in range(5):
-            x,y = next(position_iterator)
+            x, y = next(position_iterator)
 
         self.assertEqual((x, y), (2.414, -8.558))
 
@@ -96,7 +96,7 @@ class UnredTest(unittest.TestCase):
                    -0.06136380952380951, 0.16022751322751322,
                    0.11536380952380951, 0.496705291005291)
 
-        for i,j in zip(calculations[45], results):
+        for i, j in zip(calculations[45], results):
             self.assertAlmostEqual(i, j)
 
     def test_select_extinction(self):
@@ -116,15 +116,11 @@ class UnredTest(unittest.TestCase):
                    -0.19823265306122448, 0.34615646258503396,
                    0.2492326530612245, 1.0730850340136053)
 
-        for i,j in zip(calc_default[3], default):
+        for i, j in zip(calc_default[3], default):
             self.assertAlmostEqual(i, j)
 
-        for i,j in zip(calc_min[1], minimum):
+        for i, j in zip(calc_min[1], minimum):
             self.assertAlmostEqual(i, j)
 
-        for i,j in zip(calc_max[5], maximum):
+        for i, j in zip(calc_max[5], maximum):
             self.assertAlmostEqual(i, j)
-
-
-if __name__ == "__main__":
-    unittest.main()
