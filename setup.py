@@ -14,8 +14,8 @@ setuptools.setup(
     url='https://github.com/pbrus/unredden-stars',
     packages=setuptools.find_packages(exclude=['tests']),
     install_requires=[
-        'numpy==1.14.5',
-        'scipy==1.1.0',
+        'numpy',
+        'scipy',
     ],
     tests_require=['pytest'],
     keywords=['reddening', 'extinction', 'stars'],
