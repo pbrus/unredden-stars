@@ -12,7 +12,7 @@ package functions calculate which part of the sequence the reddened stars come f
 
 ## Installation
 
-The software was written in *Python 3*. To install it, please type from the command line:
+To install the package please type from the command line:
 ```bash
 $ sudo pip3 install unred
 ```
@@ -22,29 +22,20 @@ $ git clone https://github.com/pbrus/unredden-stars
 $ cd unredden-stars
 $ sudo python3 setup.py install
 ```
-Additionally the software uses the following modules:
-
- * *numpy*
- * *scipy*
-
-They can be easily installed too. Please run:
-```bash
-$ sudo pip3 install -r requirements.txt
-```
 
 ## Usage
 
-It's recommended to use the `unred_stars.py` script which is a wrapper of all functions from the package. At the beginning call the script from the terminal window with the `-h` option:
+At the beginning call the script from the terminal window with the `-h` option:
 ```bash
-$ python3 unred_stars.py -h
+$ unred_stars.py -h
 ```
 This will give you a description of available options. If you need to see the program in action immediately, you can use files from the `example_data/` directory:
 ```bash
-$ python3 unred_stars.py example_data/stars.dat example_data/ub_bv_dwarfs.dat 0.72 3.1
+$ unred_stars.py example_data/stars.dat example_data/ub_bv_dwarfs.dat 0.72 3.1
 ```
 Moreover, you can filter the output (by extinction value for each star) using `--min` or `--max` option:
 ```bash
-$ python3 unred_stars.py example_data/stars.dat example_data/ub_bv_dwarfs.dat 0.72 3.1 --min
+$ unred_stars.py example_data/stars.dat example_data/ub_bv_dwarfs.dat 0.72 3.1 --min
 ```
 
 I encourage to visit my website to see more detailed description of this program. The current link can be found on my [GitHub profile](https://github.com/pbrus).
