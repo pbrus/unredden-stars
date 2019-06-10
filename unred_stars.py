@@ -8,8 +8,10 @@ from unred.unred import *
 
 argparser = ArgumentParser(
     prog='unred_stars.py',
-    description='>> Script unreddens stars on the color-color plane <<',
-    epilog='Copyright (c) 2018 Przemysław Bruś',
+    description=dedent('''\
+    >> Determine interstellar reddening of stars on the color-color plane <<
+    '''),
+    epilog='Copyright (c) 2019 Przemysław Bruś',
     formatter_class=RawTextHelpFormatter
 )
 argparser.add_argument(
